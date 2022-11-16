@@ -1,79 +1,46 @@
-#ifndef SHELL_H
-#define SHELL_H
+#ifndef SIMPLE_SHELL
+#define SIMPLE_SHELL
 
+#include <stdarg.h>
+#include <sys/wait.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <sys/stat.h>
 #include <unistd.h>
-#include <errno.h>
-#include <dirent.h>
+#include <string.h>
 #include <signal.h>
-
-
-/*constants*/
-#define EXTERNAL_COMMAND 1
-#define INTERNAL_COMMAND 2
-#define PATH_COMMAND 3
-#define INVALID_COMMAND -1
-
-#define min(x, y) (((x) < (y)) ? (x) : (y))
-
 /**
- *struct map - a struct that maps a command name to a function 
+ * struct builtins - builtin command and functions for shell
+ * @cmd: cmd name
+ * @f: pointer to builtin functions
  *
- *@command_name: name of the command
- *@func: the function that executes the command
+ * Description: struct for builtin functions
  */
-
-typedef struct map
+typedef struct builtins
 {
-	char *command_name;
-	void (*func)(char **command);
-} function_map;
+	char *cmd;
+	int (*f)(char **args, char **env);
+} built_t;
 
-extern char **environ;
-extern char *line;
-extern char **commands;
-extern char *shell_name;
-extern int status;
+/* Function Declarations for builtin shell commands */
+int shell_env(char **args, char **env);
+int shell_exit(char **args, char **env);
+int shell_built(char **args, char **env);
 
-/*helpers*/
-void print(char *, int);
-char **tokenizer(char *, char *);
-void remove_newline(char *);
-int _strlen(char *);
-void _strcpy(char *, char *);
-
-/*helpers2*/
-int _strcmp(char *, char *);
-char *_strcat(char *, char *);
-int _strspn(char *, char *);
-int _strcspn(char *, char *);
-char *_strchr(char *, char);
-
-/*helpers3*/
-char *_strtok_r(char *, char *, char **);
-int _atoi(char *);
-void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size);
-void ctrl_c_handler(int);
-void remove_comment(char *);
-
-/*utils*/
-int parse_command(char *);
-void execute_command(char **, int);
-char *check_path(char *);
-void (*get_func(char *))(char **);
-char *_getenv(char *);
-
-/*built_in*/
-void env(char **);
-void quit(char **);
-
-/*main*/
-extern void non_interactive(void);
-extern void initializer(char **current_command, int type_command);
-
-#endif /*SHELL_H*/
+void free_array(char **array);
+void free_string(int, const unsigned int n, ...);
+char *_memcpy(char *dest, char *src, unsigned int n);
+char *_getenv(const char *name, char **env);
+int _strlen(char *s);
+int _strcmp(const char *s1, const char *s2);
+int _strcompare(const char *s1, const char *s2);
+char **strtoken(char *str);
+void get_word(char **array, char *str);
+int count_words(char *str);
+void copy_string(int end, char *s, char **word_box);
+char *concatenate_strings(char *s1, char *s2);
+void check_path(char **string, char **env);
+void signal_manipulation(int signal);
+void e_exit(char *, int status);
+int prompt(char **ptr);
+int convert_to_int(char *s);
+#endif
