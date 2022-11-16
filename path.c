@@ -1,50 +1,27 @@
 #include "shell.h"
 
 /**
- * check_path - check if command is in the path directories
- * @string: an array of strings
- * @env: an array of env vars
- * Return: pointer to the linked list
- */
-void check_path(char **string, char **env)
+* find_path - finds the path from the global enviroment
+* Return: NULL if path is not found or path if path is found.
+*/
+char *find_path(void)
 {
-	char *str1, *str2, *path;
-	int i, start, last;
+	int x;
+	char **env = environ, *path = NULL;
 
-	str1 = concatenate_strings("/", string[0]);
-	path = _getenv("PATH", env);
-	if (path == NULL)
+	while (*env)
 	{
-		free(str1);
-		exit(0);
-	}
-	start = i = last = 0;
-	while (path[i])
-	{
-		if (path[i] == ':' || path[i + 1] == '\0')
+		if (_strncmp(*env, "PATH=", 5) == 0)
 		{
-			if (path[i + 1] == '\0')
+			path = *env;
+			while (*path && x < 5)
 			{
-				i += 1;
-				last = 1;
+				path++;
+				x++;
 			}
-			else
-				path[i] = '\0';
-			str2 = concatenate_strings(path + start, str1);
-			if (access(str2, F_OK) == 0)
-			{
-				free(string[0]);
-				string[0] = str2;
-				free(str1);
-				return;
-			}
-			free(str2);
-			if (last)
-				break;
-			path[i] = ':';
-			start = i + 1;
+			return (path);
 		}
-		i += 1;
+		env++;
 	}
-	free(str1);
+	return (NULL);
 }

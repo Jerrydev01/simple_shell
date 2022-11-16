@@ -1,46 +1,61 @@
-#ifndef SIMPLE_SHELL
-#define SIMPLE_SHELL
+#ifndef SHELL_H
+#define SHELL_H
 
 #include <stdarg.h>
-#include <sys/wait.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
-#include <signal.h>
-/**
- * struct builtins - builtin command and functions for shell
- * @cmd: cmd name
- * @f: pointer to builtin functions
- *
- * Description: struct for builtin functions
- */
-typedef struct builtins
-{
-	char *cmd;
-	int (*f)(char **args, char **env);
-} built_t;
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <sys/stat.h>
+#include <time.h>
+#include <stdbool.h>
 
-/* Function Declarations for builtin shell commands */
-int shell_env(char **args, char **env);
-int shell_exit(char **args, char **env);
-int shell_built(char **args, char **env);
+/* environment variables */
+extern char **environ;
+extern __sighandler_t signal(int __sig, __sighandler_t __handler);
 
-void free_array(char **array);
-void free_string(int, const unsigned int n, ...);
-char *_memcpy(char *dest, char *src, unsigned int n);
-char *_getenv(const char *name, char **env);
+/* handle built ins */
+int checker(char **cmd, char *buf);
+void prompt_user(void);
+void handle_signal(int m);
+char **tokenizer(char *line);
+char *test_path(char **path, char *command);
+char *append_path(char *path, char *command);
+int handle_builtin(char **command, char *line);
+void exit_cmd(char **command, char *line);
+
+void print_env(void);
+
+/* string handlers */
+int _strcmp(char *s1, char *s2);
 int _strlen(char *s);
-int _strcmp(const char *s1, const char *s2);
-int _strcompare(const char *s1, const char *s2);
-char **strtoken(char *str);
-void get_word(char **array, char *str);
-int count_words(char *str);
-void copy_string(int end, char *s, char **word_box);
-char *concatenate_strings(char *s1, char *s2);
-void check_path(char **string, char **env);
-void signal_manipulation(int signal);
-void e_exit(char *, int status);
-int prompt(char **ptr);
-int convert_to_int(char *s);
-#endif
+int _strncmp(char *s1, char *s2, int n);
+char *_strdup(char *s);
+char *_strchr(char *s, char c);
+
+void execution(char *cp, char **cmd);
+char *find_path(void);
+
+/* helper function for efficient free */
+void free_buffers(char **buf);
+
+struct builtin
+{
+	char *env;
+	char *exit;
+} builtin;
+
+struct info
+{
+	int final_exit;
+	int ln_count;
+} info;
+
+struct flags
+{
+	bool interactive;
+} flags;
+
+#endif /* SHELL_H */
